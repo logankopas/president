@@ -27,8 +27,8 @@ struct deck_t
 struct player_t
 {
     char *name;
-    int size;
-    std::list<int> hand;
+    int count;
+    std::list<int> *hand;
 };
 
 deck_t *current_deck;
@@ -38,7 +38,8 @@ int num_players;
 int shuffle(void);
 int create_deck(void);
 void swap_cards(int,int,int*);
-void print_cards(int,int*);
+void print_deck(int*);
+void print_hand(int);
 int create_players(int);
 void deal(void);
 bool card_comp(int, int);

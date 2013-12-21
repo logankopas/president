@@ -29,15 +29,18 @@ int main()
     #endif
     
     create_deck();
-    print_cards(52,current_deck->deck+1);
+    print_deck(current_deck->deck);
     shuffle();
-    print_cards(52,current_deck->deck+1);
-    num_players = 1;
+    print_deck(current_deck->deck);
+    num_players = 7;
     printf("Deal\n");
     deal();
     
     printf("Hands:\n");
-    for(int i=0; i<num_players;i++);
+    for(int i=0; i<num_players;i++)
+    {
+        print_hand(i);
+    }
 
     return 0;
 }
@@ -82,11 +85,44 @@ void swap_cards(int a, int b, int *cards)
     return;
 }
 
-void print_cards(int num, int *cards)
+void print_deck(int* cards)
 {
+    /* Deck starts from cards[1] */
+    cards++;
     
     printf("|");
-    for( int i=0; i<num; i++ )
+    for( int i=0; i<DECK_SIZE; i++ )
+    {
+        switch(((*cards)-1)/13)
+        {
+            case 0:
+                printf("D");
+                break;
+            case 1:
+                printf("H");
+                break;
+            case 2:
+                printf("C");
+                break;
+            case 3:
+                printf("S");
+                break;
+        }
+
+        printf("%d|",(((*cards)-1)%13)+1);
+        cards++;
+    }
+    
+    printf("\n");
+}
+
+void print_hand(int number)
+{
+    list<int>::iterator cards;
+    cards = players[number].hand->begin();
+    
+    printf("%d:\n|",players[number].count);
+    for( int i=0; i<players[number].count; i++ )
     {
         switch(((*cards)-1)/13)
         {
@@ -119,9 +155,9 @@ int create_players(int num)
     num_players = num;      
     players = (player_t*) malloc(num * sizeof(player_t));   
 
-    for( int i=0; i<num; i++)
+    for( int i=0; i<num; i++ )
     {
-        players[i].size=0;
+        players[i].count=0;
         players[i].hand = new list<int>();
     }    
 
@@ -134,21 +170,22 @@ void deal()
     if(players == NULL)
         create_players(num_players);
 
-    for( i=0; i<=DECK_SIZE; i++ )
+    for( i=0; i<=DECK_SIZE;  )
     {
         for( j=0; j<num_players; j++ )
         {
             i++;
-            printf("%d\n",i);
 
             if(i<=DECK_SIZE)
-                printf("%d\n",current_deck->deck[i]);
-                players[j].hand.push_back(current_deck->deck[i]);      
-
+            {
+                players[j].hand->push_back(current_deck->deck[i]);          
+                printf("%d,",i);
+                players[j].count++;
+            }
         }
     }
-    //for( int j=0; j<num_players; j++ )
-    //    players[j].hand.sort(&card_comp);
+    for( int j=0; j<num_players; j++ )
+        players[j].hand->sort(&card_comp);
 
 }
 
