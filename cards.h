@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////
-//		President		        //
-//		Logan Kopas			//
-//		Copyright Dec 2013		//
+//              President                       //
+//              Logan Kopas                     //
+//              Copyright Dec 2013              //
 //////////////////////////////////////////////////
 
-#ifndef		_CARDS_H_
-#define		_CARDS_H_
+#ifndef     _CARDS_H_
+#define     _CARDS_H_
 
 #include <list>
 #include <iostream>
@@ -13,22 +13,22 @@
 #define DECK_SIZE 52
 
 enum suit 
-{	HEARTS
-,	DIAMONDS
-,	CLUBS
-,	SPADES
+{       HEARTS
+,       DIAMONDS
+,       CLUBS
+,       SPADES
 };
 
 struct deck_t
-{	
-	int deck[DECK_SIZE + 1];
+{       
+    int deck[DECK_SIZE + 1];
 };
 
 struct player_t
 {
-	char *name;
-	int size;
-	std::list<int> hand;
+    char *name;
+    int size;
+    std::list<int> hand;
 };
 
 deck_t *current_deck;

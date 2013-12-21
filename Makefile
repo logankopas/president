@@ -5,7 +5,7 @@
 #################################################
 
 CC = g++ -c 
-CFLAGS = -Wall -Wextra --pedantic
+CFLAGS = -Wall -Wextra --pedantic -g
 LD = g++ -o $@
 
 all: cards
