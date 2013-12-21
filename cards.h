@@ -7,6 +7,11 @@
 #ifndef		_CARDS_H_
 #define		_CARDS_H_
 
+#include <list>
+#include <iostream>
+
+#define DECK_SIZE 52
+
 enum suit 
 {	HEARTS
 ,	DIAMONDS
@@ -16,19 +21,26 @@ enum suit
 
 struct deck_t
 {	
-	int deck[53];
+	int deck[DECK_SIZE + 1];
 };
 
-struct hand_t
+struct player_t
 {
-	int count;
-	// Some sort of list
+	char *name;
+	int size;
+	std::list<int> hand;
 };
 
 deck_t *current_deck;
+player_t *players;
+int num_players;
 
 int shuffle(void);
 int create_deck(void);
-void swap(int,int,void*);
+void swap_cards(int,int,int*);
+void print_cards(int,int*);
+int create_players(int);
+void deal(void);
+bool card_comp(int, int);
 
 #endif
