@@ -9,7 +9,7 @@
 
 static char hostname[80];
 
-
+int gethost();
 
 
 #endif
