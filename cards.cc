@@ -11,13 +11,16 @@
 #include <algorithm>
 #include <list>
 
+#ifndef _CARDS_H_
 #include "cards.h"
+#endif 
 
 using namespace std;
 
-int main()
+/*
+int main() // for testing
 {
-    /* initialize the random number sequence */
+    *//* initialize the random number sequence *//*
 
     #ifndef SEED
         time_t start_time;
@@ -43,7 +46,8 @@ int main()
     }
 
     return 0;
-}
+}*/
+
 
 int shuffle()
 {

@@ -31,9 +31,9 @@ struct player_t
     std::list<int> *hand;
 };
 
-deck_t *current_deck;
-player_t *players;
-int num_players;
+static deck_t *current_deck;
+static player_t *players;
+static int num_players;
 
 int shuffle(void);
 int create_deck(void);
