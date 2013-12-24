@@ -17,19 +17,14 @@
 
 using namespace std;
 
+/* Declare External Globals */
+int num_players=0;
+player_t *players = NULL;
+deck_t *current_deck = NULL;
+
 /*
 int main() // for testing
 {
-    *//* initialize the random number sequence *//*
-
-    #ifndef SEED
-        time_t start_time;
-        time( &start_time );
-        srand( (unsigned int) start_time );
-    #endif
-    #ifdef SEED
-        srand( SEED );
-    #endif
     
     create_deck();
     print_deck(current_deck->deck);
@@ -58,12 +53,22 @@ int shuffle()
     
     for( int i = 0; i < 200; i++ )
         swap_cards( (rand() % 52) +1, (rand() % 52) +1, current_deck->deck );
- 
     return 0;
 }
 
 int create_deck()
 {
+    /* Initialize rand sequence */
+    
+    #ifndef SEED
+        time_t start_time;
+        time( &start_time );
+        srand( (unsigned int) start_time );
+    #endif
+    #ifdef SEED
+        srand( SEED );
+    #endif
+    
     if( current_deck == NULL )
         current_deck = (deck_t*) malloc( sizeof(deck_t) );
 

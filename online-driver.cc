@@ -25,7 +25,6 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    (void) argc;
     (void) argv;
     (void) players;
     (void) current_deck;
@@ -33,38 +32,120 @@ int main(int argc, char** argv)
     num_players = 0;
     
     gethost();
+
+    if( argc > 2 )  //then you are receiving
+    {
+        send_deck(argv[1],argv[2]);
+    }
+    else
+    {
+        receive_deck();
+    }    
+
     
     return 0;
 }
 
-/*int gethost()
+int send_deck(char* ip, char* port)
 {
-    ifaddrs *ifAddrStruct=NULL,*ifa=NULL;
-    void *tmpAddrPtr=NULL;
+    struct addrinfo hints, *res;
+    int status, sockfd, yes =1, buf, buflen;
     
-    getifaddrs(&ifAddrStruct);
+    printf("shuffling\n");
+    shuffle();
+    printf("Sending\n");
     
-    for( ifa = ifAddrStruct; ifa != NULL; ifa=ifa->ifa_next)
+    memset(&hints, 0 , sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    
+    if(( status=getaddrinfo(ip,port,&hints,&res)) !=0 )
     {
-        if( ifa->ifa_addr->sa_family==AF_INET )
-        {   // IP4 address
-            tmpAddrPtr=&((sockaddr_in*)ifa->ifa_addr)->sin_addr;
-            char addressBuffer[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-            printf("4:'%s': %s\n", ifa->ifa_name, addressBuffer);
-        }else if(ifa->ifa_addr->sa_family==AF_INET6)
-        {   // IP6 address
-            tmpAddrPtr=&((sockaddr_in6*)ifa->ifa_addr)->sin6_addr;
-            char addressBuffer[INET6_ADDRSTRLEN];
-            inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
-            printf("6:'%s': %s\n",ifa->ifa_name, addressBuffer);
-        }
+        fprintf(stderr,"getaddrinfo failed: %s\n",gai_strerror(status));
     }
     
-    return 0;
-}*/
+    sockfd=socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+    if(sockfd == -1)
+        fprintf(stderr,"sock failed\n");
+       
 
-/* 
+    if (setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) 
+    {
+        fprintf(stderr,"set sock opts failed\n");
+    } 
+    
+    if(connect(sockfd,res->ai_addr,res->ai_addrlen) == -1)
+        fprintf(stderr,"connect failed\n");
+    
+    buflen = sizeof buf;
+    status = 0;
+    buf = current_deck->deck[1];
+    while(status !=buflen || status == -1)
+    {
+        status=send(sockfd,&buf,buflen,0);
+    }
+    
+    printf("Card: %d\n",buf);    
+    
+    return 0;
+}
+
+int receive_deck()
+{
+    struct addrinfo hints, *res;
+    struct sockaddr_storage incoming;
+    socklen_t size;
+    int status, sockfd, newsock, yes =1, buf, buflen;
+    
+    memset(&hints, 0 , sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    
+    if(( status=getaddrinfo(NULL,"45555",&hints,&res)) !=0 )
+    {
+        fprintf(stderr,"getaddrinfo failed: %s\n",gai_strerror(status));
+    }
+    
+    sockfd=socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+    if(sockfd == -1)
+        fprintf(stderr,"sock failed\n");
+       
+
+    if (setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) 
+    {
+        fprintf(stderr,"set sock opts failed\n");
+    } 
+    
+    if(bind(sockfd,res->ai_addr,res->ai_addrlen) == -1)
+        fprintf(stderr,"bind failed\n");
+        
+    if(listen(sockfd,15) == -1)
+        fprintf(stderr,"listen failed\n");
+        
+    size = sizeof incoming;
+    
+    newsock = accept(sockfd,(sockaddr*)&incoming,&size);
+    if( newsock == -1 )
+        fprintf(stderr,"accept failed\n");
+    
+    // don't need this anymore
+    close(sockfd);
+    
+    buflen = sizeof buf;
+    status = 0;
+    while(status == 0 || status == -1)
+    {
+        status=recv(newsock,&buf,buflen,0);
+    }
+    
+    printf("Card: %d\n",buf);   
+    
+    
+    return 0;
+}
+
+/**
  * gethost() prints current host
  * More for practice, probably won't ever call this
  */
@@ -119,10 +200,10 @@ int gethost()
     int yes=1;
 
     // lose the pesky "Address already in use" error message
-   /* if (setsockopt(listener,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) {
+    if (setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) {
         perror("setsockopt");
         exit(1);
-    } */
+    } 
     
     bind(s,res->ai_addr,res->ai_addrlen);
     if(s==-1)
@@ -166,3 +247,31 @@ int gethost()
     
     return 0;
 }
+
+
+/*int gethost()
+{
+    ifaddrs *ifAddrStruct=NULL,*ifa=NULL;
+    void *tmpAddrPtr=NULL;
+    
+    getifaddrs(&ifAddrStruct);
+    
+    for( ifa = ifAddrStruct; ifa != NULL; ifa=ifa->ifa_next)
+    {
+        if( ifa->ifa_addr->sa_family==AF_INET )
+        {   // IP4 address
+            tmpAddrPtr=&((sockaddr_in*)ifa->ifa_addr)->sin_addr;
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            printf("4:'%s': %s\n", ifa->ifa_name, addressBuffer);
+        }else if(ifa->ifa_addr->sa_family==AF_INET6)
+        {   // IP6 address
+            tmpAddrPtr=&((sockaddr_in6*)ifa->ifa_addr)->sin6_addr;
+            char addressBuffer[INET6_ADDRSTRLEN];
+            inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
+            printf("6:'%s': %s\n",ifa->ifa_name, addressBuffer);
+        }
+    }
+    
+    return 0;
+}*/
