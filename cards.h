@@ -29,11 +29,19 @@ struct player_t
     char *name;
     int count;
     std::list<int> *hand;
+	bool pass;
+};
+
+struct cards
+{
+	int num;
+	int cards[4];
 };
 
 extern deck_t *current_deck;
 extern player_t *players;
 extern int num_players;
+extern cards played_cards;
 
 int shuffle(void);
 int create_deck(void);
@@ -43,5 +51,6 @@ void print_hand(int);
 int create_players(int);
 void deal(void);
 bool card_comp(int, int);
+void print_card(int*,int);
 
 #endif

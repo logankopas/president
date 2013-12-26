@@ -21,6 +21,7 @@ using namespace std;
 int num_players=0;
 player_t *players = NULL;
 deck_t *current_deck = NULL;
+cards played_cards;
 
 /*
 int main() // for testing
@@ -130,7 +131,7 @@ void print_hand(int number)
     list<int>::iterator cards;
     cards = players[number].hand->begin();
     
-    printf("%d:\n|",players[number].count);
+    printf("Player %d:%d\n|",number+1,players[number].count);
     for( int i=0; i<players[number].count; i++ )
     {
         switch(((*cards)-1)/13)
@@ -166,8 +167,9 @@ int create_players(int num)
 
     for( int i=0; i<num; i++ )
     {
-        players[i].count=0;
+        players[i].count= 0;
         players[i].hand = new list<int>();
+		players[i].pass = false;
     }    
 
     return 0;
@@ -188,7 +190,6 @@ void deal()
             if(i<=DECK_SIZE)
             {
                 players[j].hand->push_back(current_deck->deck[i]);          
-                printf("%d,",i);
                 players[j].count++;
             }
         }
@@ -200,8 +201,53 @@ void deal()
 
 bool card_comp(int first, int second)
 {
-    if( (first-1)%13 < (second-1)%13 )
-        return true;
+	if( ((first-1)%13)+1 == 2 || ((second-1)%13)+1 == 2 )
+	{
+		if( ((first-1)%13)+1 == 2 && ((second-1)%13)+1 == 2 )
+				return first>second;
+		else
+				return (((first-1)%13)+1 == 2);
+	}
+	else if( ((first-1)%13)+1 == 1 || ((second-1)%13)+1 == 1 )
+	{
+		if( ((first-1)%13)+1 == 1 && ((second-1)%13)+1 == 1 )
+				return first>second;
+		else
+				return (((first-1)%13)+1 == 1);
+	}
+	else if( (first-1)%13 != (second-1)%13 )
+        return (first-1)%13 > (second-1)%13;
     else
-        return first<second;
+        return first>second;
+}
+
+void print_card(int *card, int num)
+{ 
+		// TODO: need to make this a ... variable arg funct
+    printf("|");
+    for( int i=0; i<num; i++ )
+    {
+        switch(((*card)-1)/13)
+        {
+            case 0:
+                printf("D");
+                break;
+            case 1:
+                printf("H");
+                break;
+            case 2:
+                printf("C");
+                break;
+            case 3:
+                printf("S");
+                break;
+        }
+
+        printf("%d|",(((*card)-1)%13)+1);
+        card++;
+    }
+    
+    printf("\n");
+
+	return;
 }
