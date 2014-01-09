@@ -21,7 +21,7 @@ enum suit
 
 struct deck_t
 {       
-    int deck[DECK_SIZE + 1];
+    int *deck;
 };
 
 struct player_t

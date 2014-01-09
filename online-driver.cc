@@ -25,7 +25,6 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    (void) argv;
     (void) players;
     (void) current_deck;
     (void) hostname;
@@ -49,7 +48,7 @@ int main(int argc, char** argv)
 int send_deck(char* ip, char* port)
 {
     struct addrinfo hints, *res;
-    int status, sockfd, yes =1, buf, buflen;
+    int status, sockfd, yes =1, buflen, *buf;
     
     printf("shuffling\n");
     shuffle();
@@ -77,15 +76,15 @@ int send_deck(char* ip, char* port)
     if(connect(sockfd,res->ai_addr,res->ai_addrlen) == -1)
         fprintf(stderr,"connect failed\n");
     
-    buflen = sizeof buf;
+    buflen = (DECK_SIZE + 1)*(sizeof(int));
     status = 0;
-    buf = current_deck->deck[1];
+    buf = current_deck->deck;
     while(status !=buflen || status == -1)
     {
-        status=send(sockfd,&buf,buflen,0);
+        status=send(sockfd,buf,buflen,0);
     }
     
-    printf("Card: %d\n",buf);    
+    print_deck(current_deck->deck);
     
     return 0;
 }
@@ -95,7 +94,7 @@ int receive_deck()
     struct addrinfo hints, *res;
     struct sockaddr_storage incoming;
     socklen_t size;
-    int status, sockfd, newsock, yes =1, buf, buflen;
+    int status, sockfd, newsock, yes =1, *buf, buflen;
     
     memset(&hints, 0 , sizeof hints);
     hints.ai_family = AF_UNSPEC;
@@ -131,16 +130,19 @@ int receive_deck()
     
     // don't need this anymore
     close(sockfd);
+    buflen = (DECK_SIZE+1)* sizeof(int);
+    buf = (int*) malloc( buflen ); 
     
-    buflen = sizeof buf;
     status = 0;
-    while(status == 0 || status == -1)
+    while(status != buflen || status == -1)
     {
-        status=recv(newsock,&buf,buflen,0);
+        status=recv(newsock,buf,buflen,0);
     }
+    printf("Deck recieved\n");
+    create_deck();
+    current_deck->deck = buf;
     
-    printf("Card: %d\n",buf);   
-    
+    print_deck(current_deck->deck);
     
     return 0;
 }

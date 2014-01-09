@@ -72,6 +72,9 @@ int create_deck()
     
     if( current_deck == NULL )
         current_deck = (deck_t*) malloc( sizeof(deck_t) );
+        
+    if( current_deck->deck == NULL )
+        current_deck->deck = (int*)malloc((sizeof(int))*(DECK_SIZE+1));
 
     for( int i=1; i <= 52; i++ )
     {
