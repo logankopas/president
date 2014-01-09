@@ -26,19 +26,30 @@ using namespace std;
 int main(int argc, char** argv)
 {
     (void) players;
-    (void) current_deck;
-    (void) hostname;
     num_players = 0;
     
     gethost();
 
     if( argc > 2 )  //then you are receiving
     {
-        send_deck(argv[1],argv[2]);
+        num_players = argc/2;
+        for( int i=0; i<num_players; i++ )
+        {
+            send_deck(argv[(2*i)+1],argv[(2*i)+2]);
+        }
     }
     else
     {
-        receive_deck();
+        if( argc == 2 )
+        {
+            receive_deck( argv[1] );
+        }
+        else    
+        {
+            char *str = (char*)malloc(sizeof(char)*10);
+            strcpy(str,"45555");
+            receive_deck(str);
+        }
     }    
 
     
@@ -89,7 +100,7 @@ int send_deck(char* ip, char* port)
     return 0;
 }
 
-int receive_deck()
+int receive_deck(char *port)
 {
     struct addrinfo hints, *res;
     struct sockaddr_storage incoming;
@@ -101,7 +112,7 @@ int receive_deck()
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     
-    if(( status=getaddrinfo(NULL,"45555",&hints,&res)) !=0 )
+    if(( status=getaddrinfo(NULL,port,&hints,&res)) !=0 )
     {
         fprintf(stderr,"getaddrinfo failed: %s\n",gai_strerror(status));
     }
