@@ -97,7 +97,7 @@ int send_deck(char* ip, char* port)
     
     print_deck(current_deck->deck);
     
-    return 0;
+    return sockfd;
 }
 
 int receive_deck(char *port)
@@ -155,7 +155,7 @@ int receive_deck(char *port)
     
     print_deck(current_deck->deck);
     
-    return 0;
+    return newsock;
 }
 
 /**
